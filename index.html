@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Recognition Attendance System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #2196F3;
+            border-bottom: 3px solid #2196F3;
+        }
+
+        .nav-tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 40px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .stats-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            border-left: 5px solid #2196F3;
+        }
+
+        .stats-card h3 {
+            color: #2196F3;
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .stats-card p {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        .attendance-table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .table-header {
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            color: white;
+            padding: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .table-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .upload-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .upload-area {
+            border: 3px dashed #2196F3;
+            border-radius: 15px;
+            padding: 50px;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            background: #e3f2fd;
+            transform: translateY(-2px);
+        }
+
+        .upload-area.dragover {
+            background: #e3f2fd;
+            border-color: #1976d2;
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: #2196F3;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #2196F3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(33, 150, 243, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .preview-container {
+            margin-top: 20px;
+        }
+
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .camera-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .camera-controls {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .camera-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Face Recognition Attendance</h1>
+            <p>Modern AI-powered attendance tracking system</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+            <button class="nav-tab" onclick="switchTab('register')">👤 Register Person</button>
+            <button class="nav-tab" onclick="switchTab('camera')">📷 Start Attendance</button>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="dashboard-grid">
+                <div class="stats-card">
+                    <h3 id="totalRegistered">0</h3>
+                    <p>Registered People</p>
+                </div>
+                <div class="stats-card">
+                    <h3 id="todayAttendance">0</h3>
+                    <p>Today's Attendance</p>
+                </div>
+            </div>
+
+            <div class="attendance-table">
+                <div class="table-header">
+                    📋 Recent Attendance Records
+                </div>
+                <div class="table-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Time</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceTableBody">
+                            <tr>
+                                <td>John Doe</td>
+                                <td>09:15:30</td>
+                                <td>2025-06-24</td>
+                                <td><span style="color: #28a745; font-weight: bold;">✓ Present</span></td>
+                            </tr>
+                            <tr>
+                                <td>Jane Smith</td>
+                                <td>09:20:15</td>
+                                <td>2025-06-24</td>
+                                <td><span style="color: #28a745; font-weight: bold;">✓ Present</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Register Person Tab -->
+        <div id="register" class="tab-content">
+            <div class="upload-section">
+                <h2 style="margin-bottom: 30px; color: #495057;">📸 Register New Person</h2>
+                
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <h3>Drop your image here or click to browse</h3>
+                    <p>Supported formats: JPG, PNG, JPEG (Max 5MB)</p>
+                    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                </div>
+
+                <div class="preview-container" id="previewContainer" style="display: none;">
+                    <img id="imagePreview" class="image-preview" alt="Preview">
+                </div>
+
+                <div class="form-group">
+                    <label for="personName">👤 Person's Name</label>
+                    <input type="text" id="personName" class="form-control" placeholder="Enter full name..." required>
+                </div>
+
+                <button class="btn" id="registerBtn" onclick="registerPerson()" disabled>
+                    ✨ Register Person
+                </button>
+
+                <div id="alertMessage"></div>
+            </div>
+        </div>
+
+        <!-- Camera Tab -->
+        <div id="camera" class="tab-content">
+            <div class="camera-section">
+                <h2 style="margin-bottom: 30px; color: #495057;">📹 Live Attendance Tracking</h2>
+                <p style="margin-bottom: 30px; color: #6c757d;">Start the attendance system to begin face recognition</p>
+                
+                <div id="cameraContainer" style="margin-bottom: 30px;">
+                    <video id="webcamFeed" width="640" height="480" style="border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: none;" autoplay></video>
+                    <canvas id="processedFeed" width="640" height="480" style="border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: none;"></canvas>
+                    <div id="cameraPlaceholder" style="width: 640px; height: 480px; background: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 15px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                        <div style="text-align: center; color: #6c757d;">
+                            <div style="font-size: 4rem; margin-bottom: 20px;">📷</div>
+                            <h3>Camera Feed</h3>
+                            <p>Click "Start Attendance System" to begin</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="camera-controls">
+                    <button class="btn" id="startBtn" onclick="startAttendance()">
+                        🚀 Start Attendance System
+                    </button>
+                    <button class="btn" id="stopBtn" style="background: linear-gradient(45deg, #f44336, #ff5722); display: none;" onclick="stopAttendance()">
+                        ⏹️ Stop System
+                    </button>
+                </div>
+
+                <div id="attendanceStatus" style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 10px; display: none;">
+                    <h4 style="color: #1976d2; margin-bottom: 10px;">📊 Live Status</h4>
+                    <div id="detectedPersons"></div>
+                </div>
+
+                <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                    <h4>📋 Instructions:</h4>
+                    <ol style="text-align: left; margin-top: 15px;">
+                        <li>Click "Start Attendance System" to begin face recognition</li>
+                        <li>Allow camera access when prompted</li>
+                        <li>Position yourself clearly in front of the camera</li>
+                        <li>The system will automatically detect and mark attendance</li>
+                        <li>Click "Stop System" to end the session</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
