@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, Response
 from flask_cors import CORS
 import os
 import csv
@@ -8,6 +8,7 @@ import time
 from datetime import datetime
 from werkzeug.utils import secure_filename
 import json
+import requests
 
 app = Flask(__name__)
 CORS(app)
@@ -76,9 +77,9 @@ def run_attendance_system():
     """Run the attendance Python script"""
     global attendance_process, is_running
     try:
-        # Start the attendance.py script
+        # Start the attendance.py script (lowercase!)
         attendance_process = subprocess.Popen(
-            ['python', 'Attendance.py'],
+            ['python', 'attendance.py'],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
@@ -250,6 +251,20 @@ def export_attendance():
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+@app.route('/api/video-feed')
+def video_feed():
+    """Proxy the MJPEG stream from attendance.py to the frontend."""
+    try:
+        def generate():
+            with requests.get('http://localhost:5001/video_feed', stream=True, timeout=5) as r:
+                for chunk in r.iter_content(chunk_size=1024):
+                    if chunk:
+                        yield chunk
+        return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    except Exception as e:
+        print(f"Error proxying video feed: {e}")
+        return jsonify({'error': 'Video stream is not available. Please start attendance.py first.'}), 503
 
 @app.errorhandler(404)
 def not_found(error):
@@ -264,6 +279,7 @@ if __name__ == '__main__':
     print(f"Upload folder: {UPLOAD_FOLDER}")
     print(f"Attendance file: {ATTENDANCE_FILE}")
     print("Backend server starting on http://localhost:5000")
+    print("NOTE: You must start attendance.py first in a separate terminal.")
     
     # Create sample attendance file if it doesn't exist
     if not os.path.exists(ATTENDANCE_FILE):

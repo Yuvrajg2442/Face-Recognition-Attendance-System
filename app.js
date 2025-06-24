@@ -1,6 +1,5 @@
 // Global variables
 let selectedFile = null;
-let webcamStream = null;
 let attendanceData = [];
 let registeredPeople = [];
 let pythonProcess = null;
@@ -146,8 +145,6 @@ async function registerPerson() {
         if (response.ok) {
             showAlert(`✅ ${name} has been successfully registered!`, 'success');
             
-            // Reset form
-            resetRegistrationForm();
             
             // Update dashboard
             await loadRegisteredPeople();
@@ -267,13 +264,15 @@ async function startAttendance() {
         startBtn.disabled = true;
         startBtn.textContent = '⏳ Starting...';
 
-        // Start webcam
-        webcamStream = await navigator.mediaDevices.getUserMedia({ 
-            video: { width: 640, height: 480 } 
-        });
-        
-        webcamFeed.srcObject = webcamStream;
-        
+        // Remove browser webcam usage
+        // webcamStream = await navigator.mediaDevices.getUserMedia({ 
+        //     video: { width: 640, height: 480 } 
+        // });
+        // webcamFeed.srcObject = webcamStream;
+
+        // Show MJPEG stream from backend
+        webcamFeed.src = '/api/video-feed';
+
         // Show video feed and hide placeholder
         cameraPlaceholder.style.display = 'none';
         webcamFeed.style.display = 'block';
@@ -301,11 +300,6 @@ async function startAttendance() {
         console.error('Error starting attendance system:', error);
         showAlert(`❌ Failed to start attendance system: ${error.message}`, 'error');
         
-        // Clean up on error
-        if (webcamStream) {
-            webcamStream.getTracks().forEach(track => track.stop());
-            webcamStream = null;
-        }
         webcamFeed.style.display = 'none';
         cameraPlaceholder.style.display = 'flex';
         stopBtn.style.display = 'none';
@@ -328,7 +322,7 @@ function startAttendanceMonitoring() {
             // Check for new attendance records
             await loadAttendanceData();
             updateDashboard();
-            updateDetectionStatus();
+            
         } catch (error) {
             console.error('Error monitoring attendance:', error);
         }
@@ -361,13 +355,8 @@ async function stopAttendance() {
         pythonProcess = false;
     }
 
-    // Stop webcam
-    if (webcamStream) {
-        webcamStream.getTracks().forEach(track => track.stop());
-        webcamStream = null;
-    }
-    
-    // Update UI
+    // Remove MJPEG stream
+    webcamFeed.src = '';
     webcamFeed.style.display = 'none';
     cameraPlaceholder.style.display = 'flex';
     stopBtn.style.display = 'none';
