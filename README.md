@@ -10,6 +10,22 @@ A modern AI-powered attendance tracking system using face recognition, OpenCV, F
 - Dashboard with attendance statistics and recent records.
 - Export attendance data as CSV.
 
+
+## Images
+
+- **Dashboard Page:**  
+  ![Dashboard Screenshot](Screenshots/Dashboard.png)
+
+- **Register Person Page:**  
+  ![Register Person Screenshot](Screenshots/Register.png)
+
+- **Live Attendance Page:**  
+  ![Live Attendance Screenshot](Screenshots/FaceRecognition2.png)
+
+
+
+---
+
 ## Folder Structure
 
 ```

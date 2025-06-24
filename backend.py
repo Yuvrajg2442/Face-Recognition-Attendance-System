@@ -129,6 +129,12 @@ def upload_person():
             # Save file to imageattendance folder
             file_path = os.path.join(UPLOAD_FOLDER, filename)
             file.save(file_path)
+
+            # Notify attendance.py to reload images
+            try:
+                requests.post('http://localhost:5001/reload', timeout=2)
+            except Exception as e:
+                print(f"Could not notify attendance.py to reload: {e}")
             
             return jsonify({
                 'message': f'Successfully registered {name}',
