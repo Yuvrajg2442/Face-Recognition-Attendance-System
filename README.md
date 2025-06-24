@@ -64,7 +64,8 @@ pip install -r requirements.txt
 ## Usage
 
 - **Register Person:**  
-  Go to the "Register Person" tab, upload a clear face image, and enter the person's name.
+  Go to the "Register Person" tab, upload a clear face image, and enter the person's name and click on Upload.
+  Then Refresh the website.
 
 - **Start Attendance:**  
   Go to the "Start Attendance" tab and click "Start Attendance System".  
@@ -110,14 +111,5 @@ pip install -r requirements.txt
   ```
   python -c "import numpy; print(numpy.__version__)"
   ```
-
-## Credits
-
-- [OpenCV](https://opencv.org/)
-- [face_recognition](https://github.com/ageitgey/face_recognition)
-- [Flask](https://flask.palletsprojects.com/)
-- UI inspired by modern dashboard designs.
-
----
 
 **Made by Yuvraj Gupta**
